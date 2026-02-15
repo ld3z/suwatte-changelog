@@ -11,7 +11,7 @@
         <div class="post-header-meta">
             <a href="{{ section.permalink }}" class="post-tag">
                 {% if section.extra.icon %}
-                <img src="{{ section.extra.icon }}" alt="" class="tag-icon">
+                <img src="{{ config.base_url }}{{ section.extra.icon }}" alt="" class="tag-icon">
                 {% endif %}
                 {{ section.title }}
             </a>
