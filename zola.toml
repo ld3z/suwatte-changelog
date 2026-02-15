@@ -1,0 +1,24 @@
+# The URL the site will be built for
+base_url = "https://ld3z.github.io/suwatte-changelog"
+title = "ld3z's Runners"
+
+# Whether to automatically compile all Sass files in the sass directory
+compile_sass = true
+
+# Whether to build a search index to be used later on by a JavaScript library
+build_search_index = false
+
+# Generate Atom feed for the whole site
+generate_feeds = true
+feed_filenames = ["rss.xml"]
+
+[markdown]
+github_alerts = true
+
+[markdown.highlighting]
+theme = "catppuccin-mocha"
+
+[extra]
+# Put all your custom variables here
+# Maximum number of entries shown in the "All Updates" list on the homepage (0 = show all)
+home_max_updates = 5

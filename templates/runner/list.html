@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{{ section.title }} — Changelog{% endblock %}
+{% block head_extra %}
+<link rel="alternate" type="application/rss+xml" title="{{ section.title }} Changelog" href="{{ section.permalink }}rss.xml">
+{% endblock %}
+
+{% block content %}
+<section class="runner-hero">
+    {% if section.extra.icon %}
+    <img src="{{ section.extra.icon }}" alt="{{ section.title }}" class="runner-hero-icon">
+    {% endif %}
+    <div class="runner-hero-text">
+        <h1>{{ section.title }}</h1>
+        {% if section.extra.description %}
+        <p class="runner-hero-desc">{{ section.extra.description }}</p>
+        {% endif %}
+        <div class="runner-hero-actions">
+            <span class="pill">{{ section.pages | length }} release{{ section.pages | length | pluralize }}</span>
+            <a href="{{ section.permalink }}rss.xml" class="pill pill-link" title="{{ section.title }} RSS Feed">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+                RSS
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="article-list">
+    {% set sorted_pages = section.pages | sort(attribute="extra.version") | reverse %}
+    {% set_global prev_date = "" %}
+    {% for page in sorted_pages %}
+    {% if prev_date != "" %}
+    {% set prev_ts = prev_date | date(format="%s") | int %}
+    {% set curr_ts = page.date | date(format="%s") | int %}
+    {% set days_diff = (prev_ts - curr_ts) / 86400 | round %}
+    {% if days_diff > 0 %}
+    <div class="post-card-connector">
+        <span class="connector-line"></span>
+        <span class="connector-days">{{ days_diff }}d gap</span>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% set_global prev_date = page.date %}
+    <article class="post-card">
+        <div class="post-card-meta">
+            {% if page.extra.version %}
+            <span class="post-version">v{{ page.extra.version }}</span>
+            {% endif %}
+            {% if page.extra.is_latest %}
+            <span class="pill pill-latest"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Latest</span>
+            {% endif %}
+            <time class="post-date" datetime="{{ page.date }}">{{ page.date | date(format="%b %d, %Y") }}</time>
+        </div>
+        <h3 class="post-card-title">
+            <a href="{{ page.permalink }}">{{ page.title }}</a>
+        </h3>
+        <div class="post-card-summary">
+            {{ page.content | safe }}
+        </div>
+    </article>
+    {% endfor %}
+</section>
+
+{% if paginator %}
+<nav class="paginator">
+    {% if paginator.previous %}
+    <a href="{{ paginator.previous }}" class="paginator-link">← Newer</a>
+    {% endif %}
+    <span class="paginator-info">Page {{ paginator.current_index }} / {{ paginator.number_pagers }}</span>
+    {% if paginator.next %}
+    <a href="{{ paginator.next }}" class="paginator-link">Older →</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endblock %}

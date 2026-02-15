@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}{{ config.title }}{% endblock %}
+
+{% block content %}
+{% set root = get_section(path="_index.md") %}
+
+<section class="hero">
+    <h1>{{ config.title }}</h1>
+    <p class="hero-sub">Stay up to date with the latest runner updates</p>
+</section>
+
+<section class="runners-grid">
+    {% for subsection_path in root.subsections | sort %}
+        {% set runner = get_section(path=subsection_path) %}
+        <a href="{{ runner.permalink }}" class="runner-card">
+            {% if runner.extra.icon %}
+            <img src="{{ runner.extra.icon }}" alt="{{ runner.title }}" class="runner-card-icon">
+            {% endif %}
+            <div class="runner-card-body">
+                <h3 class="runner-card-title">{{ runner.title }}</h3>
+                {% if runner.extra.description %}
+                <p class="runner-card-desc">{{ runner.extra.description }}</p>
+                {% endif %}
+                <span class="runner-card-count">{{ runner.pages | length }} release{{ runner.pages | length | pluralize }}</span>
+            </div>
+            {% set latest_page = runner.pages | sort(attribute="date") | reverse | first %}
+            {% set today_epoch = now() | date(format="%s") | int %}
+            {% set page_epoch = latest_page.date | date(format="%s") | int %}
+            {% set days_ago = (today_epoch - page_epoch) / 86400 | round | int %}
+            {% if days_ago < 7 %}
+            {% set time_str = days_ago ~ "d" %}
+            {% elif days_ago < 30 %}
+            {% set weeks = (days_ago / 7) | round | int %}
+            {% set time_str = weeks ~ "w" %}
+            {% elif days_ago < 365 %}
+            {% set months = (days_ago / 30) | round | int %}
+            {% set time_str = months ~ "mo" %}
+            {% else %}
+            {% set years = (days_ago / 365) | round | int %}
+            {% set time_str = years ~ "y" %}
+            {% endif %}
+            <span class="runner-card-days">{{ time_str }}</span>
+        </a>
+    {% endfor %}
+</section>
+
+<h2 class="section-title">All Updates</h2>
+
+<section class="article-list">
+    {% set all_pages = [] %}
+    {% for subsection_path in root.subsections | sort %}
+        {% set runner = get_section(path=subsection_path) %}
+        {% for page in runner.pages %}
+            {% set_global all_pages = all_pages | concat(with=page) %}
+        {% endfor %}
+    {% endfor %}
+    {% set all_pages = all_pages | sort(attribute="date") | reverse %}
+
+    {% set max_updates = config.extra.home_max_updates | default(value=0) %}
+    {% set_global prev_date = "" %}
+    {% for page in all_pages %}
+    {% if max_updates == 0 or loop.index <= max_updates %}
+    {% set page_runner_path = page.ancestors | last %}
+    {% set page_runner = get_section(path=page_runner_path) %}
+    {% if prev_date != "" %}
+    {% set prev_ts = prev_date | date(format="%s") | int %}
+    {% set curr_ts = page.date | date(format="%s") | int %}
+    {% set days_diff = (prev_ts - curr_ts) / 86400 | round %}
+    {% if days_diff > 0 %}
+    <div class="post-card-connector">
+        <span class="connector-line"></span>
+        <span class="connector-days">{{ days_diff }}d gap</span>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% set_global prev_date = page.date %}
+    <article class="post-card">
+        <div class="post-card-meta">
+            <a href="{{ page_runner.permalink }}" class="post-tag">
+                {% if page_runner.extra.icon %}
+                <img src="{{ page_runner.extra.icon }}" alt="" class="tag-icon">
+                {% endif %}
+                {{ page_runner.title }}
+            </a>
+            {% if page.extra.version %}
+            <span class="post-version">v{{ page.extra.version }}</span>
+            {% endif %}
+            {% if page.extra.is_latest %}
+            <span class="pill pill-latest"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Latest</span>
+            {% endif %}
+            <time class="post-date" datetime="{{ page.date }}">{{ page.date | date(format="%b %d, %Y") }}</time>
+        </div>
+        <h3 class="post-card-title">
+            <a href="{{ page.permalink }}">{{ page.title }}</a>
+        </h3>
+        <div class="post-card-summary">
+            {{ page.content | safe }}
+        </div>
+    </article>
+    {% endif %}
+    {% endfor %}
+</section>
+{% endblock %}

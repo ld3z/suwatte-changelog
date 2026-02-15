@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} — Changelog{% endblock %}
+{% block description %}{{ page.title }}{% endblock %}
+
+{% block content %}
+{% set section = get_section(path=page.ancestors | last) %}
+
+<article class="post-full">
+    <header class="post-header">
+        <div class="post-header-meta">
+            <a href="{{ section.permalink }}" class="post-tag">
+                {% if section.extra.icon %}
+                <img src="{{ section.extra.icon }}" alt="" class="tag-icon">
+                {% endif %}
+                {{ section.title }}
+            </a>
+            {% if page.extra.version %}
+            <span class="post-version">v{{ page.extra.version }}</span>
+            {% endif %}
+            <time class="post-date" datetime="{{ page.date }}">{{ page.date | date(format="%B %d, %Y") }}</time>
+        </div>
+        <h1>{{ page.title }}</h1>
+    </header>
+
+    <div class="post-body">
+        {{ page.content | safe }}
+    </div>
+
+    <footer class="post-footer">
+        <a href="{{ section.permalink }}" class="back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            Back to {{ section.title }}
+        </a>
+    </footer>
+</article>
+{% endblock %}
