@@ -23,7 +23,7 @@
                     <li>
                         <a href="{{ runner.permalink }}" class="nav-link {% if current_path is starting_with(runner.path) %}active{% endif %}" title="{{ runner.title }}">
                             {% if runner.extra.icon %}
-                            <img src="{{ runner.extra.icon }}" alt="" class="nav-icon">
+                            <img src="{{ config.base_url }}{{ runner.extra.icon }}" alt="" class="nav-icon">
                             {% endif %}
                             <span class="nav-label">{{ runner.title }}</span>
                         </a>
