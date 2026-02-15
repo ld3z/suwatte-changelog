@@ -14,8 +14,9 @@
     {% for subsection_path in root.subsections | sort %}
         {% set runner = get_section(path=subsection_path) %}
         <a href="{{ runner.permalink }}" class="runner-card">
+            {% set base = config.base_url %}
             {% if runner.extra.icon %}
-            <img src="{{ runner.extra.icon }}" alt="{{ runner.title }}" class="runner-card-icon">
+            <img src="{{ base }}{{ runner.extra.icon }}" alt="{{ runner.title }}" class="runner-card-icon">
             {% endif %}
             <div class="runner-card-body">
                 <h3 class="runner-card-title">{{ runner.title }}</h3>
@@ -78,8 +79,9 @@
     <article class="post-card">
         <div class="post-card-meta">
             <a href="{{ page_runner.permalink }}" class="post-tag">
+                {% set base = config.base_url %}
                 {% if page_runner.extra.icon %}
-                <img src="{{ page_runner.extra.icon }}" alt="" class="tag-icon">
+                <img src="{{ base }}{{ page_runner.extra.icon }}" alt="" class="tag-icon">
                 {% endif %}
                 {{ page_runner.title }}
             </a>

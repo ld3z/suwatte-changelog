@@ -7,8 +7,9 @@
 
 {% block content %}
 <section class="runner-hero">
+    {% set base = config.base_url %}
     {% if section.extra.icon %}
-    <img src="{{ section.extra.icon }}" alt="{{ section.title }}" class="runner-hero-icon">
+    <img src="{{ base }}{{ section.extra.icon }}" alt="{{ section.title }}" class="runner-hero-icon">
     {% endif %}
     <div class="runner-hero-text">
         <h1>{{ section.title }}</h1>
